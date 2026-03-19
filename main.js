@@ -63,6 +63,7 @@ let handleUserLeft = (MemberId) => {
 
     let videoPlayer = document.getElementById(`user-${MemberId}`)
     if(videoPlayer) videoPlayer.remove()
+    updateGridLayout()
 }
 
 let handleMessageFromPeer = async (message, MemberId) => {
@@ -88,6 +89,7 @@ if(message.type === 'answer'){
 let handleUserJoined = async (MemberId) => {
     console.log('A new user joined the channel:', MemberId)
     createOffer(MemberId)
+    updateGridLayout()
 }
 
 
@@ -154,7 +156,18 @@ let addAnswer = async (MemberId, answer) => {
         peerConnections[MemberId].setRemoteDescription(answer)
     }
 }
+let updateGridLayout = () => {
+    let videoContainer = document.getElementById('videos')
+    let memberCount = Object.keys(peerConnections).length + 1
 
+    videoContainer.className = ''
+
+    if(memberCount === 2) videoContainer.classList.add('two-members')
+    if(memberCount === 3) videoContainer.classList.add('three-members')
+    if(memberCount === 4) videoContainer.classList.add('four-members')
+    if(memberCount === 5) videoContainer.classList.add('five-members')
+    if(memberCount === 6) videoContainer.classList.add('six-members')
+}
 
 let leaveChannel = async () => {
     await channel.leave()
