@@ -88,7 +88,7 @@ if(message.type === 'answer'){
 let handleUserJoined = async (MemberId) => {
     console.log('A new user joined the channel:', MemberId)
     createOffer(MemberId)
-    updateGridLayout()
+    
 }
 
 
@@ -104,13 +104,10 @@ let createPeerConnection = async (MemberId) => {
     videoPlayer.autoplay = true
     videoPlayer.playsInline = true
     videoPlayer.srcObject = remoteStream
+    videoPlayer.classList.add('video-player')
     document.getElementById('videos').appendChild(videoPlayer)
-
-    let nameTag = document.createElement('div')
-    nameTag.className = 'name-tag'
-    nameTag.textContent = memberNames[MemberId] || 'Guest'
-    document.getElementById('videos').appendChild(nameTag)
-
+    updateGridLayout()
+    
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream)
     })
