@@ -1,6 +1,5 @@
 let APP_ID = "39f32aaf6f764969b7d22f3d019e0087"
 
-
 let token = null;
 let uid = String(Math.floor(Math.random() * 10000))
 
@@ -17,7 +16,7 @@ if(!roomId){
 }
 
 let localStream;
-let peerConnection = {};
+let peerConnections = {};
 let memberNames = {};
 
 const servers = {

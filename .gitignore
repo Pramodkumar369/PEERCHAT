@@ -1,0 +1,11 @@
+*.env
+.env
+logs/
+objects/
+temp/
+node_modules/
+dist/
+*.log
+*.tmp
+hooks/
+.git
