@@ -9,15 +9,16 @@ let channel;
 
 let queryString = window.location.search
 let urlParams = new URLSearchParams(queryString)
-let roomId = urlParams.get('room')
+const roomId = urlParams.get('room')
+let displayName = urlParams.get('name') || 'Guest'
 
 if(!roomId){
     window.location = 'lobby.html'
 }
 
 let localStream;
-let remoteStream;
-let peerConnection;
+let peerConnection = {};
+let memberNames = {};
 
 const servers = {
     iceServers:[
@@ -37,7 +38,6 @@ let constraints = {
 }
 
 let init = async () => {
-    // Get camera FIRST before anything else
     localStream = await navigator.mediaDevices.getUserMedia(constraints)
     document.getElementById('user-1').srcObject = localStream
 
@@ -56,8 +56,13 @@ let init = async () => {
  
 
 let handleUserLeft = (MemberId) => {
-    document.getElementById('user-2').style.display = 'none'
-    document.getElementById('user-1').classList.remove('smallFrame')
+    if(peerConnections[MemberId]){
+        peerConnections[MemberId].close()
+        delete peerConnections[MemberId]
+    }
+
+    let videoPlayer = document.getElementById(`user-${MemberId}`)
+    if(videoPlayer) videoPlayer.remove()
 }
 
 let handleMessageFromPeer = async (message, MemberId) => {
@@ -65,20 +70,19 @@ let handleMessageFromPeer = async (message, MemberId) => {
     message = JSON.parse(message.text)
 
     if(message.type === 'offer'){
+        memberNames[MemberId] = message.name || 'Guest' 
         createAnswer(MemberId, message.offer)
     }
 
-    if(message.type === 'answer'){
-        addAnswer(message.answer)
+if(message.type === 'answer'){
+    addAnswer(MemberId, message.answer)
+}
+
+   if(message.type === 'candidate'){
+    if(peerConnections[MemberId]){
+        peerConnections[MemberId].addIceCandidate(message.candidate)
     }
-
-    if(message.type === 'candidate'){
-        if(peerConnection){
-            peerConnection.addIceCandidate(message.candidate)
-        }
-    }
-
-
+}
 }
 
 let handleUserJoined = async (MemberId) => {
@@ -88,19 +92,23 @@ let handleUserJoined = async (MemberId) => {
 
 
 let createPeerConnection = async (MemberId) => {
-    peerConnection = new RTCPeerConnection(servers)
+    if(peerConnections[MemberId]) return
 
-    remoteStream = new MediaStream()
-    document.getElementById('user-2').srcObject = remoteStream
-    document.getElementById('user-2').style.display = 'block'
+    let peerConnection = new RTCPeerConnection(servers)
+    peerConnections[MemberId] = peerConnection
 
-    document.getElementById('user-1').classList.add('smallFrame')
+    let remoteStream = new MediaStream()
+    let videoPlayer = document.createElement('video')
+    videoPlayer.id = `user-${MemberId}`
+    videoPlayer.autoplay = true
+    videoPlayer.playsInline = true
+    videoPlayer.srcObject = remoteStream
+    document.getElementById('videos').appendChild(videoPlayer)
 
-
-    if(!localStream){
-        localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:false})
-        document.getElementById('user-1').srcObject = localStream
-    }
+    let nameTag = document.createElement('div')
+    nameTag.className = 'name-tag'
+    nameTag.textContent = memberNames[MemberId] || 'Guest'
+    document.getElementById('videos').appendChild(nameTag)
 
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream)
@@ -122,28 +130,28 @@ let createPeerConnection = async (MemberId) => {
 let createOffer = async (MemberId) => {
     await createPeerConnection(MemberId)
 
-    let offer = await peerConnection.createOffer()
-    await peerConnection.setLocalDescription(offer)
+    let offer = await peerConnections[MemberId].createOffer()
+    await peerConnections[MemberId].setLocalDescription(offer)
 
-    client.sendMessageToPeer({text:JSON.stringify({'type':'offer', 'offer':offer})}, MemberId)
+    client.sendMessageToPeer({text:JSON.stringify({'type':'offer','offer':offer,'name':displayName})},MemberId)
 }
 
 
 let createAnswer = async (MemberId, offer) => {
     await createPeerConnection(MemberId)
 
-    await peerConnection.setRemoteDescription(offer)
+    await peerConnections[MemberId].setRemoteDescription(offer)
 
-    let answer = await peerConnection.createAnswer()
-    await peerConnection.setLocalDescription(answer)
+    let answer = await peerConnections[MemberId].createAnswer()
+    await peerConnections[MemberId].setLocalDescription(answer)
 
     client.sendMessageToPeer({text:JSON.stringify({'type':'answer', 'answer':answer})}, MemberId)
 }
 
 
-let addAnswer = async (answer) => {
-    if(!peerConnection.currentRemoteDescription){
-        peerConnection.setRemoteDescription(answer)
+let addAnswer = async (MemberId, answer) => {
+    if(!peerConnections[MemberId].currentRemoteDescription){
+        peerConnections[MemberId].setRemoteDescription(answer)
     }
 }
 

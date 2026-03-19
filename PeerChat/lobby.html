@@ -17,7 +17,8 @@
 
             <div id="form__content__wrapper">
                 <form id="join-form">
-                    <input type="text" name="invite_link" required/>
+                    <input type="text" name="display_name" placeholder="Your name (e.g. Alex)" required/>
+                    <input type="text" name="invite_link" placeholder="Room code" required/>
                     <input type="submit" value="Join Room" />
                 </form>
             </div>
@@ -31,11 +32,12 @@
 <script>
     let form = document.getElementById('join-form')
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        let inviteCode = e.target.invite_link.value
-        window.location = `index.html?room=${inviteCode}` 
-    })
+   form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    let inviteCode = e.target.invite_link.value
+    let displayName = e.target.display_name.value
+    window.location = `index.html?room=${inviteCode}&name=${encodeURIComponent(displayName)}`
+})
 </script>
 
 </html>
