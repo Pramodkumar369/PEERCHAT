@@ -98,3 +98,31 @@ video {
             width: 20px;
         }
 }
+
+#notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-family: sans-serif;
+    font-size: 14px;
+    z-index: 999;
+    display: none;
+}
+
+#member-count {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: sans-serif;
+    font-size: 14px;
+    z-index: 999;
+}

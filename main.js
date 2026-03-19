@@ -55,6 +55,8 @@ let init = async () => {
  
 
 let handleUserLeft = (MemberId) => {
+    showNotification(`👋 ${memberNames[MemberId] || 'Someone'} left the room`)
+
     if(peerConnections[MemberId]){
         peerConnections[MemberId].close()
         delete peerConnections[MemberId]
@@ -63,6 +65,7 @@ let handleUserLeft = (MemberId) => {
     let videoPlayer = document.getElementById(`user-${MemberId}`)
     if(videoPlayer) videoPlayer.remove()
     updateGridLayout()
+    updateMemberCount()
 }
 
 let handleMessageFromPeer = async (message, MemberId) => {
@@ -88,7 +91,8 @@ if(message.type === 'answer'){
 let handleUserJoined = async (MemberId) => {
     console.log('A new user joined the channel:', MemberId)
     createOffer(MemberId)
-    
+    showNotification(`👋 ${memberNames[MemberId] || 'Someone'} joined the room`)
+    updateMemberCount()
 }
 
 
@@ -164,7 +168,20 @@ let updateGridLayout = () => {
     if(memberCount === 5) videoContainer.classList.add('five-members')
     if(memberCount === 6) videoContainer.classList.add('six-members')
 }
+let showNotification = (message) => {
+    let notification = document.getElementById('notification')
+    let notificationText = document.getElementById('notification-text')
+    notificationText.textContent = message
+    notification.style.display = 'block'
+    setTimeout(() => {
+        notification.style.display = 'none'
+    }, 3000)
+}
 
+let updateMemberCount = () => {
+    let count = Object.keys(peerConnections).length + 1
+    document.getElementById('count').textContent = count
+}
 let leaveChannel = async () => {
     await channel.leave()
     await client.logout()
