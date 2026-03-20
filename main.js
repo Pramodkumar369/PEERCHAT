@@ -91,7 +91,6 @@ if(message.type === 'answer'){
 let handleUserJoined = async (MemberId) => {
     console.log('A new user joined the channel:', MemberId)
     createOffer(MemberId)
-    showNotification(`👋 ${memberNames[MemberId] || 'Someone'} joined the room`)
     updateMemberCount()
 }
 

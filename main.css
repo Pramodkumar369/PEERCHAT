@@ -13,10 +13,30 @@
 }
 
 #videos.two-members{
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
 }
 
-#videos.three-members, #videos.four-members{
+#videos.two-members video:last-child{
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 180px;
+    height: 120px;
+    border-radius: 10px;
+    border: 2px solid #b366f9;
+    z-index: 999;
+}
+
+#videos.three-members{
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr 1fr;
+}
+
+#videos.three-members video:not(:first-child){
+    height: 100%;
+}
+
+#videos.four-members{
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
 }
