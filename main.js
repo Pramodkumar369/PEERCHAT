@@ -73,9 +73,10 @@ let handleMessageFromPeer = async (message, MemberId) => {
     message = JSON.parse(message.text)
 
     if(message.type === 'offer'){
-        memberNames[MemberId] = message.name || 'Guest' 
-        createAnswer(MemberId, message.offer)
-    }
+    memberNames[MemberId] = message.name || 'Guest' 
+    showNotification(`👋 ${memberNames[MemberId]} joined the room`)
+    createAnswer(MemberId, message.offer)
+}
 
 if(message.type === 'answer'){
     addAnswer(MemberId, message.answer)
