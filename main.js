@@ -175,22 +175,45 @@ let updateGridLayout = () => {
 let makeDraggable = (element) => {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
 
+    let dragStart = (x, y) => {
+        pos3 = x
+        pos4 = y
+    }
+
+    let dragMove = (x, y) => {
+        pos1 = pos3 - x
+        pos2 = pos4 - y
+        pos3 = x
+        pos4 = y
+        element.style.top = (element.offsetTop - pos2) + 'px'
+        element.style.left = (element.offsetLeft - pos1) + 'px'
+    }
+
+    // Mouse support
     element.onmousedown = (e) => {
         e.preventDefault()
-        pos3 = e.clientX
-        pos4 = e.clientY
+        dragStart(e.clientX, e.clientY)
         document.onmouseup = () => {
             document.onmouseup = null
             document.onmousemove = null
+            element.style.cursor = 'grab'
         }
         document.onmousemove = (e) => {
-            pos1 = pos3 - e.clientX
-            pos2 = pos4 - e.clientY
-            pos3 = e.clientX
-            pos4 = e.clientY
-            element.style.top = (element.offsetTop - pos2) + 'px'
-            element.style.left = (element.offsetLeft - pos1) + 'px'
+            element.style.cursor = 'grabbing'
+            dragMove(e.clientX, e.clientY)
         }
+    }
+
+    // Touch support for mobile
+    element.ontouchstart = (e) => {
+        let touch = e.touches[0]
+        dragStart(touch.clientX, touch.clientY)
+    }
+
+    element.ontouchmove = (e) => {
+        e.preventDefault()
+        let touch = e.touches[0]
+        dragMove(touch.clientX, touch.clientY)
     }
 }
 let showNotification = (message) => {
