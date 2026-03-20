@@ -114,6 +114,7 @@ let createPeerConnection = async (MemberId) => {
     document.getElementById('videos').appendChild(videoPlayer)
     updateGridLayout()
     updateMemberCount()
+    makeDraggable(videoPlayer)
     
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream)
@@ -170,6 +171,27 @@ let updateGridLayout = () => {
     if(memberCount === 4) videoContainer.classList.add('four-members')
     if(memberCount === 5) videoContainer.classList.add('five-members')
     if(memberCount === 6) videoContainer.classList.add('six-members')
+}
+let makeDraggable = (element) => {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
+
+    element.onmousedown = (e) => {
+        e.preventDefault()
+        pos3 = e.clientX
+        pos4 = e.clientY
+        document.onmouseup = () => {
+            document.onmouseup = null
+            document.onmousemove = null
+        }
+        document.onmousemove = (e) => {
+            pos1 = pos3 - e.clientX
+            pos2 = pos4 - e.clientY
+            pos3 = e.clientX
+            pos4 = e.clientY
+            element.style.top = (element.offsetTop - pos2) + 'px'
+            element.style.left = (element.offsetLeft - pos1) + 'px'
+        }
+    }
 }
 let showNotification = (message) => {
     let notification = document.getElementById('notification')
