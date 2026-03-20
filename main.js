@@ -72,13 +72,15 @@ let handleMessageFromPeer = async (message, MemberId) => {
 
     message = JSON.parse(message.text)
 
-    if(message.type === 'offer'){
+   if(message.type === 'offer'){
     memberNames[MemberId] = message.name || 'Guest' 
     showNotification(`👋 ${memberNames[MemberId]} joined the room`)
     createAnswer(MemberId, message.offer)
 }
 
 if(message.type === 'answer'){
+    memberNames[MemberId] = message.name || 'Guest'
+    showNotification(`👋 ${memberNames[MemberId]} joined the room`)
     addAnswer(MemberId, message.answer)
 }
 
@@ -111,6 +113,7 @@ let createPeerConnection = async (MemberId) => {
     videoPlayer.classList.add('video-player')
     document.getElementById('videos').appendChild(videoPlayer)
     updateGridLayout()
+    updateMemberCount()
     
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream)
@@ -147,7 +150,7 @@ let createAnswer = async (MemberId, offer) => {
     let answer = await peerConnections[MemberId].createAnswer()
     await peerConnections[MemberId].setLocalDescription(answer)
 
-    client.sendMessageToPeer({text:JSON.stringify({'type':'answer', 'answer':answer})}, MemberId)
+    client.sendMessageToPeer({text:JSON.stringify({'type':'answer', 'answer':answer, 'name':displayName})}, MemberId)
 }
 
 
