@@ -211,10 +211,12 @@ let makeDraggable = (element) => {
     }
 
     element.ontouchmove = (e) => {
-        e.preventDefault()
-        let touch = e.touches[0]
-        dragMove(touch.clientX, touch.clientY)
-    }
+    element.style.touchAction = 'none'
+    e.preventDefault()
+    e.stopPropagation()
+    let touch = e.touches[0]
+    dragMove(touch.clientX, touch.clientY)
+}
 }
 let showNotification = (message) => {
     let notification = document.getElementById('notification')
